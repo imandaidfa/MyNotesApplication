@@ -36,16 +36,7 @@ android {
     buildFeatures {
         compose = true
     }
-    sourceSets {
-        getByName("debug") {
-            java.srcDir("build/generated/ksp/debug/kotlin")
-            java.srcDir("build/generated/ksp/debug/java")
-        }
-        getByName("release") {
-            java.srcDir("build/generated/ksp/release/kotlin")
-            java.srcDir("build/generated/ksp/release/java")
-        }
-    }
+
 }
 
 dependencies {
