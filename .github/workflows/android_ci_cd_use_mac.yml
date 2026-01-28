@@ -12,36 +12,51 @@ on:
         - debug
         - release
 
+env:
+  SAMPLE_PATH: .
+
 jobs:
   build:
     name: Build and Test
     runs-on: macos-26
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4 # Versi stabil terbaru
 
-      - name: Set up JDK 17 # Diubah dari 11 ke 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17' # Runner Gradle butuh minimal 17
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Grant Execute Permission for Gradlew
-        run: chmod +x gradlew
-
-
-      - name: Build APK
+      # Memastikan folder ~/.gradle ada dan menyalin config khusus CI
+      - name: Copy CI gradle.properties
         run: |
-          if [ "${{ github.event.inputs.build_type }}" == "debug" ]; then
-            ./gradlew assembleDebug
+          mkdir -p ~/.gradle
+          if [ -f .github/ci-gradle.properties ]; then
+            cp .github/ci-gradle.properties ~/.gradle/gradle.properties
           else
-            ./gradlew assembleRelease
+            echo "Warning: .github/ci-gradle.properties tidak ditemukan!"
           fi
 
-      - name: Upload APK Artifact
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # Action resmi Gradle untuk optimasi cache otomatis
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build project
+        working-directory: ${{ env.SAMPLE_PATH }}
+        run: ./gradlew assembleDebug lintDebug --stacktrace
+
+      - name: Upload build outputs (APKs)
         uses: actions/upload-artifact@v4
         with:
-          name: MyNotes-${{ github.event.inputs.build_type }}
-          path: app/build/outputs/apk/${{ github.event.inputs.build_type }}/*.apk
+          name: build-outputs
+          path: ${{ env.SAMPLE_PATH }}/app/build/outputs/apk/debug
+
+      - name: Upload build reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: ${{ env.SAMPLE_PATH }}/app/build/reports
