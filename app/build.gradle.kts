@@ -36,6 +36,9 @@ android {
     buildFeatures {
         compose = true
     }
+    sourceSets {
+        getByName("main").java.srcDirs("build/generated/ksp/main/kotlin")
+    }
 }
 
 dependencies {
