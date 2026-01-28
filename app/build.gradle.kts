@@ -38,10 +38,12 @@ android {
     }
     sourceSets {
         getByName("debug") {
-            java.srcDirs("build/generated/ksp/debug/kotlin", "build/generated/ksp/debug/java")
+            java.srcDir("build/generated/ksp/debug/kotlin")
+            java.srcDir("build/generated/ksp/debug/java")
         }
         getByName("release") {
-            java.srcDirs("build/generated/ksp/release/kotlin", "build/generated/ksp/release/java")
+            java.srcDir("build/generated/ksp/release/kotlin")
+            java.srcDir("build/generated/ksp/release/java")
         }
     }
 }
